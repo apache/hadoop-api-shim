@@ -47,10 +47,10 @@
     <enforced.java.version>${javac.version}</enforced.java.version>
 
     <!-- this is the version built against-->
-    <hadoop.build.version>3.2.0</hadoop.build.version>
+    <hadoop.build.version>3.2.4</hadoop.build.version>
 
     <!-- the hadoop version tested against -->
-    <hadoop.test.version>3.3.0</hadoop.test.version>
+    <hadoop.test.version>3.2.4</hadoop.test.version>
     <hadoop.3.2.test.version>3.2.4</hadoop.3.2.test.version>
     <hadoop.3.3.test.version>3.3.5</hadoop.3.3.test.version>
 
