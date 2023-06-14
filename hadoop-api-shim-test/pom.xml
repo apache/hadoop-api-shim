@@ -32,6 +32,16 @@
   <description>
     Module to test the hadoop-api-shim library against a later version
     of hadoop.
+    The main JAR includes resource XML files which allow for the
+    contract test classes of hadoop cloud store modules to be instantiated
+    hadoop-azure: org.apache.hadoop.fs.azurebfs.contract.AbfsFileSystemContract
+    hadop-aws: org.apache.hadoop.fs.contract.s3a.S3AContract
+    +any added later.
+    These have to go into a main jar as -test.jars are always built without
+    the resources entries on the classpath. By including this jar along with the
+    relevant cloud test modules, it's possible to wire up the test runs as per
+    the normal cloud connector test mechanism
+    (secrets or better an xminclude to the git-excluded test/resources/auth-keys.xml
   </description>
 
 

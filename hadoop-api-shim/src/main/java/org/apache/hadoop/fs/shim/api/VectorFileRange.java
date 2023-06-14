@@ -25,8 +25,10 @@ import java.util.function.IntFunction;
 import org.apache.hadoop.fs.shim.impl.VectorFileRangeImpl;
 
 /**
- * A byte range of a file.
- * This is used for the asynchronous gather read API of
+ * A byte range of a file, based on the Hadoop Vector API class
+ * {@code org.apache.hadoop.fs.FileRange} used in
+ *  {@code PositionedReadable.readVectored()}.
+ * In the shim code, it is used in for the vector read operation
  * {@link FSDataInputStreamShim#readVectoredRanges(List, IntFunction)}.
  */
 public interface VectorFileRange {
