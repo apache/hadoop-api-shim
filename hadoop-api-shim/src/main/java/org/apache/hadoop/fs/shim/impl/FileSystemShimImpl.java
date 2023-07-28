@@ -118,11 +118,10 @@ public class FileSystemShimImpl extends AbstractAPIShim<FileSystem>
     // the simpler methods.
     Class<FileSystem> clazz = getClazz();
 
-    hasPathCapabilityMethod = loadInvocation(clazz, "hasPathCapability",
-        Boolean.class,
+    hasPathCapabilityMethod = loadInvocation(clazz, Boolean.class, "hasPathCapability",
         Path.class, String.class);
 
-    msyncMethod = loadInvocation(clazz, "msync", Void.class);
+    msyncMethod = loadInvocation(clazz, Void.class, "msync");
 
     executeOpenFile = new OpenFileThroughAvailableOperation();
   }

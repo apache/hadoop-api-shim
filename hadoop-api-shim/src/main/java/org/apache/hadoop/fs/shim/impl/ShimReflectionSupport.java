@@ -121,21 +121,23 @@ public final class ShimReflectionSupport {
    */
   public static <T> Invocation<T> getInvocation(
       Class<?> source, String name, Class<?>... parameterTypes) {
-    return (Invocation<T>) loadInvocation(source, name, null, parameterTypes);
+    return (Invocation<T>) loadInvocation(source, null, name, parameterTypes);
   }
 
   /**
    * Get an invocation from the source class, which will be unavailable() if
    * the class is null or the method isn't found.
-   * @param source source
-   * @param name method name
+   *
    * @param <T> return type
+   * @param source source
    * @param returnType return type class for the compiler to be happy
+   * @param name method name
    * @param parameterTypes parameters
+   *
    * @return the method or "unavailable"
    */
   public static <T> Invocation<T> loadInvocation(
-      Class<?> source, String name, Class<? extends T> returnType, Class<?>... parameterTypes) {
+      Class<?> source, Class<? extends T> returnType, String name, Class<?>... parameterTypes) {
     if (source == null) {
       return unavailable(name);
     }

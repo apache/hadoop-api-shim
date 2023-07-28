@@ -18,8 +18,6 @@
 
 package org.apache.hadoop.fs.shim.impl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.hadoop.fs.shim.api.VectorFileRange;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.hadoop.fs.shim.impl.ShimReflectionSupport.ctor;
 import static org.apache.hadoop.fs.shim.impl.ShimReflectionSupport.loadInvocation;
 
 /**
@@ -38,15 +35,27 @@ import static org.apache.hadoop.fs.shim.impl.ShimReflectionSupport.loadInvocatio
 public final class FileRangeBridge {
   private static final Logger LOG = LoggerFactory.getLogger(FileRangeBridge.class);
 
-  public static final String CLASSNAME = "org.apache.hadoop.fs.impl.FileRangeImpl";
+  /**
+   * Name of the {@code FileRange} interface.
+   */
+  public static final String CLASSNAME = "org.apache.hadoop.fs.FileRange";
 
-  private final Class<?> fileRangeClass;
+  /**
+   * Class of the interface {@link #CLASSNAME}, if loaded.
+   * This can resolve all methods in this interface and super-interfaces,
+   * including static ones.
+   */
+  private final Class<?> fileRangeInterface;
   private final Invocation<Long> _getOffset;
   private final Invocation<Integer> _getLength;
   private final Invocation<CompletableFuture<ByteBuffer>> _getData;
   private final Invocation<Void> _setData;
   private final Invocation<Object> _getReference;
-  private final Constructor<?> newFileRange;
+
+  /**
+   * new FileRange(long, long, Object)
+   */
+  private final Invocation<Object> createFileRange;
 
   /**
    * Constructor.
@@ -61,59 +70,67 @@ public final class FileRangeBridge {
       LOG.debug("No {}", CLASSNAME);
       cl = null;
     }
-    fileRangeClass = cl;
+    fileRangeInterface = cl;
     // class found, so load the methods
-    _getOffset = loadInvocation(fileRangeClass, "getOffset", Long.class);
-    _getLength= loadInvocation(fileRangeClass, "getLength", Integer.class);
-    _getData = loadInvocation(fileRangeClass, "getData", null);
-    _setData = loadInvocation(fileRangeClass, "setData", Void.class, CompletableFuture.class);
-    _getReference = loadInvocation(fileRangeClass, "getReference", Object.class);
+    _getOffset = loadInvocation(fileRangeInterface, Long.class, "getOffset");
+    _getLength = loadInvocation(fileRangeInterface, Integer.class, "getLength");
+    _getData = loadInvocation(fileRangeInterface, null, "getData");
+    _setData = loadInvocation(fileRangeInterface, Void.class, "setData", CompletableFuture.class);
+    _getReference = loadInvocation(fileRangeInterface, Object.class, "getReference");
 
-    newFileRange = ctor(fileRangeClass, Long.class, Integer.class, Object.class);
+    // static interface method to create an instance.
+    createFileRange = loadInvocation(fileRangeInterface, Object.class, "createFileRange", Long.class,
+        Integer.class, Object.class);
+
   }
 
   /**
    * Is the bridge available.
+   *
    * @return true iff the bridge is present.
    */
   public boolean bridgeAvailable() {
-    return fileRangeClass != null;
+    return fileRangeInterface != null;
   }
 
   /**
    * Get the file range class.
+   *
    * @return the file range implementation class, if present.
    */
-  public Class<?> getFileRangeClass() {
-    return fileRangeClass;
+  public Class<?> getFileRangeInterface() {
+    return fileRangeInterface;
   }
 
   /**
    * Instantiate.
+   *
+   * @param offset offset in file
+   * @param length length of data to read.
+   * @param reference nullable reference to store in the range.
    * @return a VectorFileRange wrapping a FileRange
+   *
    * @throws RuntimeException if the range cannot be instantiated
    * @throws IllegalStateException if the API is not available.
    */
-  public WrappedFileRange newWrappedFileRange(long offset, int length) {
+  public VectorFileRange createFileRange(long offset, int length, final Object reference) {
     Preconditions.checkState(bridgeAvailable(), "FileRange not available");
-    try {
-      return new WrappedFileRange(newFileRange.newInstance(offset, length));
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new RuntimeException("failed to instantiate a FileRange object: " + e,
-          e);
-    }
+    return new WrappedFileRange(createFileRange.invokeUnchecked(null, offset, length, reference));
   }
 
   /**
-   * Convert a range to an instance of FileRange
-   * @param in input
+   * Convert a range to an instance of FileRange.
+   * The offset, length and reference of the input range
+   * all passed into the createFileRange() method.
+   * @param range input range
+   *
    * @return a converted instance
    */
-  public Object toFileRange(VectorFileRange in) {
+  public Object toFileRange(VectorFileRange range) {
     // create a new wrapped file range, fill in and then
     // get the instance
-    final WrappedFileRange wfr = newWrappedFileRange(in.getOffset(), in.getLength());
-    wfr.setData(in.getData());
+    final WrappedFileRange wfr = createFileRange(
+        range.getOffset(), range.getLength(), range.getReference());
     return wfr.getInstance();
   }
 
@@ -124,10 +141,15 @@ public final class FileRangeBridge {
    * API to interact with these.
    */
   private class WrappedFileRange implements VectorFileRange {
-    final Object instance;
+
+    /**
+     * The wrapped range.
+     */
+    private final Object instance;
 
     /**
      * Instantiate.
+     *
      * @param instance non null instance.
      */
     private WrappedFileRange(final Object instance) {
@@ -162,6 +184,7 @@ public final class FileRangeBridge {
 
     /**
      * Get the instance.
+     *
      * @return the instance.
      */
     public Object getInstance() {

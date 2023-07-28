@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
@@ -103,15 +102,14 @@ public class FSDataInputStreamShimImpl
   public FSDataInputStreamShimImpl(
       final FSDataInputStream instance) {
     super(FSDataInputStream.class, instance);
-    byteBufferPositionedRead = loadInvocation(getClazz(), READ,
-        Integer.class,
+    byteBufferPositionedRead = loadInvocation(getClazz(), Integer.class, READ,
         Long.class, ByteBuffer.class);
 
     boolean bbrb = instance.hasCapability(PREADBYTEBUFFER)
         && byteBufferPositionedRead.available();
     if (bbrb) {
       byteBufferPositionedReadFully = loadInvocation(getClazz(),
-          READ_FULLY, Void.class, Long.class, ByteBuffer.class);
+          Void.class, READ_FULLY, Long.class, ByteBuffer.class);
       isByteBufferPositionedReadAvailable = new AtomicBoolean(true);
     } else {
       byteBufferPositionedReadFully = unavailable(READ_FULLY);
@@ -122,8 +120,8 @@ public class FSDataInputStreamShimImpl
     isByteBufferReadableAvailable = new AtomicBoolean(
         instance.getWrappedStream() instanceof ByteBufferReadable);
     if (FILE_RANGE_BRIDGE.bridgeAvailable()) {
-      readVectored = loadInvocation(getClazz(), READ_VECTORED,
-          Void.class, List.class, Function.class);
+      readVectored = loadInvocation(getClazz(), Void.class, READ_VECTORED,
+          List.class, IntFunction.class);
     } else {
       readVectored = unavailable(READ_VECTORED);
     }
