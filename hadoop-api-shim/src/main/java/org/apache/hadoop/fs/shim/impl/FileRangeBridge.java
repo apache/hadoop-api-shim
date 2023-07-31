@@ -72,15 +72,15 @@ public final class FileRangeBridge {
     }
     fileRangeInterface = cl;
     // class found, so load the methods
-    _getOffset = loadInvocation(fileRangeInterface, Long.class, "getOffset");
-    _getLength = loadInvocation(fileRangeInterface, Integer.class, "getLength");
+    _getOffset = loadInvocation(fileRangeInterface, long.class, "getOffset");
+    _getLength = loadInvocation(fileRangeInterface, int.class, "getLength");
     _getData = loadInvocation(fileRangeInterface, null, "getData");
-    _setData = loadInvocation(fileRangeInterface, Void.class, "setData", CompletableFuture.class);
+    _setData = loadInvocation(fileRangeInterface, void.class, "setData", CompletableFuture.class);
     _getReference = loadInvocation(fileRangeInterface, Object.class, "getReference");
 
     // static interface method to create an instance.
-    createFileRange = loadInvocation(fileRangeInterface, Object.class, "createFileRange", Long.class,
-        Integer.class, Object.class);
+    createFileRange = loadInvocation(fileRangeInterface, Object.class, "createFileRange", long.class,
+        int.class, Object.class);
 
   }
 
@@ -129,7 +129,7 @@ public final class FileRangeBridge {
   public Object toFileRange(VectorFileRange range) {
     // create a new wrapped file range, fill in and then
     // get the instance
-    final WrappedFileRange wfr = createFileRange(
+    final VectorFileRange wfr = createFileRange(
         range.getOffset(), range.getLength(), range.getReference());
     return wfr.getInstance();
   }

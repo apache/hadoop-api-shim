@@ -102,14 +102,14 @@ public class FSDataInputStreamShimImpl
   public FSDataInputStreamShimImpl(
       final FSDataInputStream instance) {
     super(FSDataInputStream.class, instance);
-    byteBufferPositionedRead = loadInvocation(getClazz(), Integer.class, READ,
-        Long.class, ByteBuffer.class);
+    byteBufferPositionedRead = loadInvocation(getClazz(), int.class, READ,
+        long.class, ByteBuffer.class);
 
     boolean bbrb = instance.hasCapability(PREADBYTEBUFFER)
         && byteBufferPositionedRead.available();
     if (bbrb) {
       byteBufferPositionedReadFully = loadInvocation(getClazz(),
-          Void.class, READ_FULLY, Long.class, ByteBuffer.class);
+          void.class, READ_FULLY, long.class, ByteBuffer.class);
       isByteBufferPositionedReadAvailable = new AtomicBoolean(true);
     } else {
       byteBufferPositionedReadFully = unavailable(READ_FULLY);
@@ -120,7 +120,7 @@ public class FSDataInputStreamShimImpl
     isByteBufferReadableAvailable = new AtomicBoolean(
         instance.getWrappedStream() instanceof ByteBufferReadable);
     if (FILE_RANGE_BRIDGE.bridgeAvailable()) {
-      readVectored = loadInvocation(getClazz(), Void.class, READ_VECTORED,
+      readVectored = loadInvocation(getClazz(), void.class, READ_VECTORED,
           List.class, IntFunction.class);
     } else {
       readVectored = unavailable(READ_VECTORED);

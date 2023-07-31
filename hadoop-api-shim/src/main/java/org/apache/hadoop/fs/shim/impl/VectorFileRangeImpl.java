@@ -89,4 +89,9 @@ public class VectorFileRangeImpl implements VectorFileRange {
   public Object getReference() {
     return reference;
   }
+
+  @Override
+  public Object getInstance() {
+    return null;
+  }
 }

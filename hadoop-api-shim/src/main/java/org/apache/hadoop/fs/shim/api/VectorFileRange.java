@@ -74,6 +74,14 @@ public interface VectorFileRange {
   Object getReference();
 
   /**
+   * Get the wrapped instance.
+   * Return null if it is not actually wrapping anything.
+   * @return wrapped object.
+   */
+  Object getInstance();
+
+  /**
+   *
    * Factory method to create a VectorFileRange object.
    *
    * @param offset starting offset of the range.
