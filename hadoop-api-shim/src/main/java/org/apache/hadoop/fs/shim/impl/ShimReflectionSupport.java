@@ -268,4 +268,21 @@ public final class ShimReflectionSupport {
     }
     return result.toString();
   }
+
+
+  /**
+   * Load a class; return null if it is not found.
+   * @param name classname.
+   * @return the class, if found
+   */
+  public static Class<?> loadClass(final String name) {
+    Class<?> cl;
+    try {
+      cl = ShimReflectionSupport.class.getClassLoader().loadClass(name);
+    } catch (ClassNotFoundException e) {
+      LOG.debug("No {}", name);
+      cl = null;
+    }
+    return cl;
+  }
 }

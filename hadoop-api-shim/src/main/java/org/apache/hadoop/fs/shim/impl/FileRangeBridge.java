@@ -63,14 +63,7 @@ public final class FileRangeBridge {
   public FileRangeBridge() {
 
     // try to load the class
-    Class<?> cl;
-    try {
-      cl = this.getClass().getClassLoader().loadClass(CLASSNAME);
-    } catch (ClassNotFoundException e) {
-      LOG.debug("No {}", CLASSNAME);
-      cl = null;
-    }
-    fileRangeInterface = cl;
+    fileRangeInterface = ShimReflectionSupport.loadClass(CLASSNAME);
     // class found, so load the methods
     _getOffset = loadInvocation(fileRangeInterface, long.class, "getOffset");
     _getLength = loadInvocation(fileRangeInterface, int.class, "getLength");
@@ -83,6 +76,7 @@ public final class FileRangeBridge {
         int.class, Object.class);
 
   }
+
 
   /**
    * Is the bridge available.
