@@ -52,6 +52,7 @@
     <hadoop.test.version>3.3.0</hadoop.test.version>
     <hadoop.3.2.test.version>3.2.4</hadoop.3.2.test.version>
     <hadoop.3.3.test.version>3.3.5</hadoop.3.3.test.version>
+    <hadoop.3.4.test.version>3.4.0</hadoop.3.4.test.version>
 
     <junit.version>4.13.2</junit.version>
     <junit.jupiter.version>5.5.1</junit.jupiter.version>
@@ -71,6 +72,7 @@
     <module>hadoop-api-shim-test</module>
     <module>hadoop-api-shim-test-3.2</module>
     <module>hadoop-api-shim-test-3.3</module>
+    <module>hadoop-api-shim-test-3.4</module>
   </modules>
 
   <dependencyManagement>

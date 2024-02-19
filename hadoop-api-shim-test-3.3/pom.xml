@@ -59,7 +59,7 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
-      <version>${hadoop.3.2.test.version}</version>
+      <version>${hadoop.3.3.test.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -71,6 +71,7 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
       <type>test-jar</type>
+      <version>${hadoop.3.3.test.version}</version>
       <scope>test</scope>
     </dependency>
 
